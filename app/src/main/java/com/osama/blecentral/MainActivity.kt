@@ -260,7 +260,6 @@ class MainActivity : AppCompatActivity() {
         .build()
 
     private val scanCallback = object : ScanCallback() {
-        @RequiresApi(Build.VERSION_CODES.O)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val name: String? = result.scanRecord?.deviceName ?: result.device.name
             appendLog("onScanResult name=$name address= ${result.device?.address}")
@@ -270,7 +269,11 @@ class MainActivity : AppCompatActivity() {
             Intent(this@MainActivity, BleGattService::class.java).also { intent ->
                 intent.action = Actions.START_FOREGROUND
                 BluetoothServiceManager.currentDevice = result.device
-                this@MainActivity.startForegroundService(intent)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this@MainActivity.startForegroundService(intent)
+                } else {
+                    startService(intent)
+                }
             }
         }
 
