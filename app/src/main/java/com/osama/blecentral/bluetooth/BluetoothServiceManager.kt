@@ -41,8 +41,7 @@ object BluetoothServiceManager {
     private var gattCallback: BluetoothGattCallback? = null
 
     // Properties for current chat device connection
-    private var currentDevice: BluetoothDevice? = null
-
+    var currentDevice: BluetoothDevice? = null
 
     fun subscribeToIndications(
         characteristic: BluetoothGattCharacteristic, gatt: BluetoothGatt
@@ -58,11 +57,10 @@ object BluetoothServiceManager {
         }
     }
 
-    fun setConnection(device: BluetoothDevice, context: Context) {
-        currentDevice = device
+    fun setConnection(device: BluetoothDevice?, context: Context) {
         lifecycleState = BLELifecycleState.Connecting
-        gattCallback = GattCallback()
-        device.connectGatt(context, false, gattCallback)
+        gattCallback = GattCallback(context)
+        device?.connectGatt(context, false, gattCallback)
     }
 
     fun setConnectedGattToNull() {

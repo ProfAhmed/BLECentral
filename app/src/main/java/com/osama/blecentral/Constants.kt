@@ -1,5 +1,6 @@
 package com.osama.blecentral
 
+const val NOTIFICATION_FOREGROUND_ID = 1
 const val CHANNEL_ID = "bel_central_example"
 const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 const val LOCATION_PERMISSION_REQUEST_CODE = 2

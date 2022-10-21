@@ -33,6 +33,8 @@ import com.osama.blecentral.bluetooth.BluetoothServiceManager.readTextValue
 import com.osama.blecentral.bluetooth.BluetoothServiceManager.restartLifecycle
 import com.osama.blecentral.bluetooth.BluetoothServiceManager.setConnectedGattToNull
 import com.osama.blecentral.bluetooth.BluetoothServiceManager.subscriptionStrResValue
+import com.osama.blecentral.bluetooth.service.BleGattService
+import com.osama.blecentral.bluetooth.utils.Actions
 import com.osama.blecentral.bluetooth.utils.AskType
 import com.osama.blecentral.bluetooth.utils.BLELifecycleState
 import com.osama.blecentral.databinding.ActivityMainBinding
@@ -89,7 +91,6 @@ class MainActivity : AppCompatActivity() {
             indicationTextValue.collectLatest {
                 it ?: return@collectLatest
                 binding.textViewIndicateValue.text = it
-                showNotification(this@MainActivity, it)
             }
         }
     }
@@ -110,7 +111,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        bleEndLifecycle()
         super.onDestroy()
     }
 
@@ -260,11 +260,18 @@ class MainActivity : AppCompatActivity() {
         .build()
 
     private val scanCallback = object : ScanCallback() {
+        @RequiresApi(Build.VERSION_CODES.O)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val name: String? = result.scanRecord?.deviceName ?: result.device.name
             appendLog("onScanResult name=$name address= ${result.device?.address}")
             safeStopBleScan()
-            BluetoothServiceManager.setConnection(result.device, this@MainActivity)
+
+            //start connection in background
+            Intent(this@MainActivity, BleGattService::class.java).also { intent ->
+                intent.action = Actions.START_FOREGROUND
+                BluetoothServiceManager.currentDevice = result.device
+                this@MainActivity.startForegroundService(intent)
+            }
         }
 
         override fun onBatchScanResults(results: MutableList<ScanResult>?) {

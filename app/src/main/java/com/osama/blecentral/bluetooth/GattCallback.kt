@@ -1,9 +1,12 @@
 package com.osama.blecentral.bluetooth
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.bluetooth.*
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import com.osama.blecentral.*
 import com.osama.blecentral.bluetooth.BluetoothServiceManager.characteristicForIndicate
 import com.osama.blecentral.bluetooth.BluetoothServiceManager.characteristicForRead
@@ -21,7 +24,7 @@ import com.osama.blecentral.bluetooth.utils.BLELifecycleState
 import java.util.*
 
 @SuppressLint("MissingPermission")
-class GattCallback : BluetoothGattCallback() {
+class GattCallback(private val context: Context) : BluetoothGattCallback() {
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
         // TODO: timeout timer: if this callback not called - disconnect(), wait 120ms, close()
 
@@ -137,7 +140,13 @@ class GattCallback : BluetoothGattCallback() {
         if (characteristic.uuid == UUID.fromString(CHAR_FOR_INDICATE_UUID)) {
             val strValue = characteristic.value.toString(Charsets.UTF_8)
             logCallback.invoke("onCharacteristicChanged value=\"$strValue\"")
+            Log.d("onCharacteristicChanged", "onCharacteristicChanged value=\"$strValue\"")
             indicationTextValue.value = strValue
+            val notification = showForGroundNotification(context, strValue)
+
+            val mNotificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            mNotificationManager.notify(NOTIFICATION_FOREGROUND_ID, notification)
 
         } else {
             logCallback.invoke("onCharacteristicChanged unknown uuid $characteristic.uuid")

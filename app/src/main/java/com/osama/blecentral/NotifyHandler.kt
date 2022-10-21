@@ -1,5 +1,6 @@
 package com.osama.blecentral
 
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -31,6 +32,22 @@ fun showNotification(context: Context, message: String) {
     }
 }
 
+fun showForGroundNotification(context: Context,message: String): Notification {
+
+    val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
+    val notificationIntent = Intent(context, MainActivity::class.java)
+    val pendingIntent: PendingIntent =
+        PendingIntent.getActivity(context, 0, notificationIntent, getPendingIntentFlag())
+    return notificationBuilder.setOngoing(true)
+        .setSmallIcon(R.mipmap.ic_launcher)
+        .setContentTitle("Service is running in background")
+        .setContentText(message)
+        .setPriority(NotificationCompat.PRIORITY_MIN)
+        .setCategory(Notification.CATEGORY_SERVICE)
+        .setContentIntent(pendingIntent)
+        .build()
+}
+
 private fun createNotificationIntent(
     context: Context,
     data: String
@@ -45,7 +62,7 @@ private fun createNotificationIntent(
     }
 }
 
-private fun getPendingIntentFlag(): Int {
+fun getPendingIntentFlag(): Int {
     return when {
         android.os.Build.VERSION.SDK_INT >= 31 -> PendingIntent.FLAG_IMMUTABLE
         android.os.Build.VERSION.SDK_INT >= 23 -> PendingIntent.FLAG_UPDATE_CURRENT
