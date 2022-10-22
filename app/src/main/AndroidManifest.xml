@@ -34,7 +34,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BLECentral">
         <activity
-            android:name="com.osama.blecentral.MainActivity"
+            android:name="com.osama.blecentral.ui.MainActivity"
             android:configChanges="orientation"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -46,7 +46,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".bluetooth.service.BleGattService"/>
+        <service android:name=".bluetooth.background.BleGattService"/>
 
     </application>
 

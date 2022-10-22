@@ -6,7 +6,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.osama.blecentral.CCC_DESCRIPTOR_UUID
-import com.osama.blecentral.bluetooth.utils.BLELifecycleState
+import com.osama.blecentral.utils.BLELifecycleState
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
@@ -40,7 +40,6 @@ object BluetoothServiceManager {
 
     private var gattCallback: BluetoothGattCallback? = null
 
-    // Properties for current chat device connection
     var currentDevice: BluetoothDevice? = null
 
     fun subscribeToIndications(
@@ -63,11 +62,11 @@ object BluetoothServiceManager {
         device?.connectGatt(context, false, gattCallback)
     }
 
+    //disconnected occurred
     fun setConnectedGattToNull() {
         connectedGatt = null
         characteristicForRead = null
         characteristicForWrite = null
         characteristicForIndicate = null
     }
-
 }

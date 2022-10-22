@@ -1,6 +1,5 @@
-package com.osama.blecentral.bluetooth.service
+package com.osama.blecentral.bluetooth.background
 
-import android.annotation.SuppressLint
 import android.app.Service
 import android.bluetooth.BluetoothDevice
 import android.content.Context
@@ -9,12 +8,16 @@ import android.os.IBinder
 import android.util.Log
 import com.osama.blecentral.NOTIFICATION_FOREGROUND_ID
 import com.osama.blecentral.bluetooth.BluetoothServiceManager
-import com.osama.blecentral.bluetooth.utils.Actions
-import com.osama.blecentral.showForGroundNotification
+import com.osama.blecentral.utils.Actions
+import com.osama.blecentral.utils.showForGroundNotification
 
-@SuppressLint("MissingPermission")
 class BleGattService : Service() {
     private val TAG = "BleService"
+
+    override fun onCreate() {
+        super.onCreate()
+        startForeground(this, null)
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "Action Received = ${intent?.action}")
@@ -36,18 +39,19 @@ class BleGattService : Service() {
 
     private fun startForeground(context: Context, device: BluetoothDevice?) {
 
-        val notification = showForGroundNotification(context, "empty message")
+        var notification = showForGroundNotification(context, "empty message")
 
         startForeground(NOTIFICATION_FOREGROUND_ID, notification)
 
         //connect
-        BluetoothServiceManager.setConnection(device, context)
+        if (device != null) {
+            notification =
+                showForGroundNotification(context, BluetoothServiceManager.lifecycleState.name)
+            startForeground(NOTIFICATION_FOREGROUND_ID, notification)
+            BluetoothServiceManager.setConnection(device, context)
+        }
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 
     override fun onBind(p0: Intent?): IBinder? {
         return null

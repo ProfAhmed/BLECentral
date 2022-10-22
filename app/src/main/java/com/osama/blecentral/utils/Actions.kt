@@ -1,4 +1,4 @@
-package com.osama.blecentral.bluetooth.utils
+package com.osama.blecentral.utils
 
 object Actions {
     private const val prefix = "lilly.ble.mvvmservice"

@@ -1,7 +1,6 @@
 package com.osama.blecentral.bluetooth
 
 import android.annotation.SuppressLint
-import android.app.NotificationManager
 import android.bluetooth.*
 import android.content.Context
 import android.os.Handler
@@ -20,7 +19,8 @@ import com.osama.blecentral.bluetooth.BluetoothServiceManager.restartLifecycle
 import com.osama.blecentral.bluetooth.BluetoothServiceManager.setConnectedGattToNull
 import com.osama.blecentral.bluetooth.BluetoothServiceManager.subscribeToIndications
 import com.osama.blecentral.bluetooth.BluetoothServiceManager.subscriptionStrResValue
-import com.osama.blecentral.bluetooth.utils.BLELifecycleState
+import com.osama.blecentral.utils.BLELifecycleState
+import com.osama.blecentral.utils.notifyForeGroundNotification
 import java.util.*
 
 @SuppressLint("MissingPermission")
@@ -37,7 +37,6 @@ class GattCallback(private val context: Context) : BluetoothGattCallback() {
 
                 // TODO: bonding state
 
-                // recommended on UI thread https://punchthrough.com/android-ble-guide/
                 Handler(Looper.getMainLooper()).post {
                     lifecycleState = BLELifecycleState.ConnectedDiscovering
                     gatt.discoverServices()
@@ -57,7 +56,7 @@ class GattCallback(private val context: Context) : BluetoothGattCallback() {
             setConnectedGattToNull()
             gatt.close()
             lifecycleState = BLELifecycleState.Disconnected
-            restartLifecycle.postValue(true)
+            restartLifecycle.postValue(false)
         }
     }
 
@@ -142,11 +141,7 @@ class GattCallback(private val context: Context) : BluetoothGattCallback() {
             logCallback.invoke("onCharacteristicChanged value=\"$strValue\"")
             Log.d("onCharacteristicChanged", "onCharacteristicChanged value=\"$strValue\"")
             indicationTextValue.value = strValue
-            val notification = showForGroundNotification(context, strValue)
-
-            val mNotificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            mNotificationManager.notify(NOTIFICATION_FOREGROUND_ID, notification)
+            notifyForeGroundNotification(context, strValue)
 
         } else {
             logCallback.invoke("onCharacteristicChanged unknown uuid $characteristic.uuid")

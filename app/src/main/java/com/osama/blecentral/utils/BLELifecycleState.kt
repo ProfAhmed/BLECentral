@@ -1,4 +1,4 @@
-package com.osama.blecentral.bluetooth.utils
+package com.osama.blecentral.utils
 
 enum class BLELifecycleState {
     Disconnected,
